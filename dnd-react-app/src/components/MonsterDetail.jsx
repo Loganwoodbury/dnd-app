@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 import MonsterService from '../services/MonsterService';
 import { useParams } from 'react-router-dom';
+import styles from '../components/MonsterDetail.module.css';
 
 export default function MonsterDetail() {
 
@@ -46,7 +47,7 @@ return (
         {isLoading ? (
             <p>Loading...</p>
         ) : (
-            <> 
+            <div className={styles.modalBackdrop}> 
                 <h1>{monsterDet.name}</h1>
                 <p>
                     <span>{monsterDet.size}</span>&nbsp;
@@ -89,6 +90,7 @@ return (
                 <hr />
                 {monsterDet.strength && (
                     <>
+                        <div className={styles.stats}>
                         <p>
                             <span>Strength</span>&nbsp;
                             <span>Dexterity</span>&nbsp;
@@ -105,6 +107,7 @@ return (
                             <span>{monsterDet.wisdom}</span>&nbsp;
                             <span>{monsterDet.charisma}</span>
                         </p>
+                        </div>
                     </>
                 )}
                 <hr />
@@ -232,7 +235,7 @@ return (
                         ))}
                     </>
                 )}
-            </>
+            </div>
         )}
     </>
 )

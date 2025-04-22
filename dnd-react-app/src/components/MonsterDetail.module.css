@@ -1,0 +1,21 @@
+.modal-backdrop {
+    background-color: #fce5cd;
+}
+
+h1 {
+    font-size: 2rem;
+    color: #4e4d4d;
+}
+
+.stats {
+    display : flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stats > p {
+    display: flex;
+    justify-content: space-evenly;
+    width: 75%;
+}
+
