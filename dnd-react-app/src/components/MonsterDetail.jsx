@@ -168,10 +168,10 @@ return (
                         <p>
                             <span>Senses: </span>
                             {monsterDet.senses.blindsight && (
-                                <span>{`Blindsight ${monsterDet.senses.blindsight}ft.`}</span>
+                                <span>{`Blindsight ${monsterDet.senses.blindsight}`}</span>
                             )}
                             {monsterDet.senses.darkvision && (
-                                <span>{`Darkvision ${monsterDet.senses.darkvision}ft.`}</span>
+                                <span>{`Darkvision ${monsterDet.senses.darkvision}`}</span>
                             )}
                             {monsterDet.senses.truesight && (
                                 <span>{`Truesight ${monsterDet.senses.truesight}ft.`}</span>
@@ -205,12 +205,12 @@ return (
                     {monsterDet.special_abilities.map((ability) => (
                         <div key= {ability.name}>
                             <span><strong>{ability.name}</strong></span>
-                            <span>{ability.desc}</span>
+                            <span>&nbsp;{ability.desc}</span>
                         </div>
                     ))}
                     </>
                 )}
-                <h3>Actions</h3>
+                <h3 id={styles.actionTitle}>Actions</h3>
                 <hr />
                 {monsterDet.actions && monsterDet.actions.length > 0 && ( 
                     <>
@@ -225,7 +225,7 @@ return (
                 
                 {monsterDet.legendary_actions && monsterDet.legendary_actions.length > 0 && (
                     <>
-                    <h3>Legendary Actions</h3>
+                    <h3 id={styles.legendaryActionTitle}>Legendary Actions</h3>
                     <hr />
                         {monsterDet.legendary_actions.map((action) => (
                             <div key={action.name}>
