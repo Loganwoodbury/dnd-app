@@ -1,0 +1,29 @@
+.journal-entry {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: "title date" "content content";
+    margin-top: 20px;
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    background-clip: padding-box;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.journal-entry > h2 {
+    grid-area: title;
+    text-align: left;
+}
+
+.date {
+    grid-area: date;
+    text-align: right;
+}
+
+.content {
+    grid-area: content;
+    margin-top: 1rem;
+    text-align: left;
+}
+

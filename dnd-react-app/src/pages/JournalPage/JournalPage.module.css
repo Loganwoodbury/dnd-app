@@ -1,0 +1,37 @@
+.entry-container {
+    margin: 10px;
+    padding: 10px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px;
+    padding: 10px;
+}
+
+form > textarea {
+    width: 80%;
+    height: 80px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #5c1f1f;
+}
+
+form > input {
+    width: 80%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #5c1f1f;
+}
+
+form > button {
+    width: 200px;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #5c1f1f;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
