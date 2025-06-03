@@ -19,7 +19,6 @@ export default function BoardComponent({lineColor, lineWidth}) {
     
     useEffect(() => {
     
-
     }, [lineColor, lineWidth]);
 
     function loadBoard(){
@@ -85,7 +84,13 @@ export default function BoardComponent({lineColor, lineWidth}) {
         }
 
         ctx.save();
-    }    
+    } 
+    
+    function handleClear(){
+        const canvas = canvasRef.current;
+        ctxRef.current.clearRect(0,0, canvas.width, canvas.height);
+        drawGrid(gridLineWidth, 20, 20, gridColor);
+    }
 
 
     return (
@@ -102,6 +107,8 @@ export default function BoardComponent({lineColor, lineWidth}) {
 
                 </canvas>
             </div>
+
+            <button onClick={handleClear}>Clear Board</button>
         
         </>
     )
