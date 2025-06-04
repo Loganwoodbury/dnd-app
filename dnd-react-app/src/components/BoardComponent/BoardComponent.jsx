@@ -109,6 +109,7 @@ export default function BoardComponent({lineColor, lineWidth}) {
             </div>
 
             <button onClick={handleClear}>Clear Board</button>
+            
         
         </>
     )

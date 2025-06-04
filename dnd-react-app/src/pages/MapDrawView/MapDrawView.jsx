@@ -1,5 +1,6 @@
 import BoardComponent from "../../components/BoardComponent/BoardComponent"
 import MapMenuComponent from "../../components/MapMenuComponent/MapMenu"
+import FileUploadComponent from "../../components/FileUploadComponent/FileUploadForm"
 import { useState } from "react";
 
 export default function MapDrawView() {
@@ -13,6 +14,7 @@ export default function MapDrawView() {
             <h1>Battle Map</h1>
             <MapMenuComponent onColorChange={setLineColor} onWidthChange={setLineWidth}/>
             <BoardComponent lineColor={lineColor} lineWidth={lineWidth}/>
+            <FileUploadComponent />
         </>
     )
 }
