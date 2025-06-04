@@ -92,6 +92,9 @@ export default function BoardComponent({lineColor, lineWidth}) {
         drawGrid(gridLineWidth, 20, 20, gridColor);
     }
 
+    function handleBackgroundChange() {
+    }
+
 
     return (
         <>
@@ -103,12 +106,15 @@ export default function BoardComponent({lineColor, lineWidth}) {
                     onKeyDown= {text}
                     width="800"
                     height="800"
-                    ref={canvasRef}>
+                    ref={canvasRef}
+                    style={{backgroundImage: 'url("/vite.svg")', backgroundSize: 'cover'}}>
+                    
 
                 </canvas>
             </div>
 
             <button onClick={handleClear}>Clear Board</button>
+            <button onClick={handleBackgroundChange}>Change Map Background</button>
             
         
         </>

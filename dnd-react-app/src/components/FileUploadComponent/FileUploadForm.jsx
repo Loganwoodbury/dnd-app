@@ -25,8 +25,8 @@ export default function FileUploadForm(){
     return (
         <>
         <form id="imageUploadForm" onSubmit={handleSubmit}>
-            <label htmlFor="imageFile">Choose Image:</label>
-            <input type="file" id="imageFile" name="imageFile" accept="image/*"></input>
+            <label htmlFor="imageFile">Choose Image To Upload:</label>
+            <input type="file" id="imageFile" name="file" accept="image/*"></input>
             <button type="submit">Upload Image</button>
         </form>
 
