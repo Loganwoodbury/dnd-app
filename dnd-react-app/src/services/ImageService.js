@@ -8,6 +8,10 @@ export default {
 
     addImage(formData){
         http.post('', formData)
+    },
+
+    getBackgrounds(){
+        return http.get('/backgrounds')
     }
 
 }

@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef } from 'react';
 import styles from './BoardComponent.module.css';
+import ImageService from '../../services/ImageService';
 export default function BoardComponent({lineColor, lineWidth}) {
 
     const canvasRef = useRef(null);
     const ctxRef = useRef(null);
     const [isDrawing, setIsDrawing] = useState(false);
+    const [isPickingBackground, setIsPickingBackground] = useState(false);
+    const [allBackgrounds, setAllBackgrounds] = useState(null);
 
      // Define default grid properties
      const gridColor = '#e0e0e0'; // A light gray for the grid
@@ -93,6 +96,15 @@ export default function BoardComponent({lineColor, lineWidth}) {
     }
 
     function handleBackgroundChange() {
+        ImageService.getBackgrounds()
+            .then(response => {
+                console.log("Backgrounds fetched successfully:", response.data);
+                setAllBackgrounds(response.data);
+                setIsPickingBackground(true);
+            })
+            .catch(error => {
+                console.error("Error fetching backgrounds:", error);
+            });
     }
 
 
@@ -115,6 +127,28 @@ export default function BoardComponent({lineColor, lineWidth}) {
 
             <button onClick={handleClear}>Clear Board</button>
             <button onClick={handleBackgroundChange}>Change Map Background</button>
+
+            {isPickingBackground && (
+                <dialog className={styles.backgroundPicker}>
+                    <h2>Select a Background</h2>
+                    <div className={styles.backgroundGrid}>
+                        {allBackgrounds && allBackgrounds.map((background, index) => (
+                            <div key={index} className={styles.backgroundItem}>
+                                <img
+                                    src={background.url}
+                                    alt={`Background ${index + 1}`}
+                                    onClick={() => {
+                                        const canvas = canvasRef.current;
+                                        canvas.style.backgroundImage = `url(${background.url})`;
+                                        setIsPickingBackground(false);
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <button onClick={() => setIsPickingBackground(false)}>Close</button>
+                </dialog>    
+            )}
             
         
         </>
