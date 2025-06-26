@@ -45,6 +45,15 @@ public class Monster {
     public ArrayList<Action> actions;
     public String url;
     public ArrayList<Object> legendary_actions;
+    public String image;
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 
     public String getIndex() {
         return index;

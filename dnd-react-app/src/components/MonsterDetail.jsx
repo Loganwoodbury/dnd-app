@@ -49,6 +49,7 @@ return (
         ) : (
             <div className={styles.modalBackdrop}> 
                 <h1>{monsterDet.name}</h1>
+                
                 <p>
                     <span>{monsterDet.size}</span>&nbsp;
                     <span>{monsterDet.type}</span>&nbsp;
