@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import MonsterService from "../../services/MonsterService";
 import { Link } from "react-router-dom";
 import LetterSearchComponent from "../../components/LetterSearchComponent/LetterSearchComponent";
+import styles from './MonsterPage.module.css';
 
 
 export default function MonsterPage() {

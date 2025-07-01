@@ -1,5 +1,10 @@
-.letter-search > span{
+.letter-search > span {
 color: brown;
 font-weight: bold;
+}
+
+.letter-search > span:hover {
+color: black;
+cursor: pointer;
 }
 
