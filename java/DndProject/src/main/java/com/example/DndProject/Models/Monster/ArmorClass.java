@@ -2,10 +2,29 @@ package com.example.DndProject.Models.Monster;
 
 public class ArmorClass {
 
+    private int id;
+    private int monsterId;
+
     private String type;
     private int value;
+    private String equipmentDescription;
+    private String spellDescription;
 
-    private String desc;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getMonsterId() {
+        return monsterId;
+    }
+
+    public void setMonsterId(int monsterId) {
+        this.monsterId = monsterId;
+    }
 
     public String getType() {
         return type;
@@ -23,11 +42,19 @@ public class ArmorClass {
         this.value = value;
     }
 
-    public String getDesc() {
-        return desc;
+    public String getEquipmentDescription() {
+        return equipmentDescription;
     }
 
-    public void setDesc(String desc) {
-        this.desc = desc;
+    public void setEquipmentDescription(String equipmentDescription) {
+        this.equipmentDescription = equipmentDescription;
+    }
+
+    public String getSpellDescription() {
+        return spellDescription;
+    }
+
+    public void setSpellDescription(String spellDescription) {
+        this.spellDescription = spellDescription;
     }
 }

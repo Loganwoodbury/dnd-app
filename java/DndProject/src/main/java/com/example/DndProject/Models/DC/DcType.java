@@ -1,10 +1,18 @@
-package com.example.DndProject.Models.Monster;
+package com.example.DndProject.Models.DC;
 
-public class Proficiency {
+public class DcType {
+    private int id;
+    private String index;
+    private String name;
+    private String url;
 
-    public String index;
-    public String name;
-    public String url;
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getIndex() {
         return index;

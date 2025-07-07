@@ -1,10 +1,14 @@
 package com.example.DndProject.Models.Monster;
 
+import com.example.DndProject.Models.Action.Action;
+import com.example.DndProject.Models.Condition.ConditionType;
+import com.example.DndProject.Models.Proficiency.Proficiencies;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
 
 public class Monster {
+    public int id;
     public String index;
     public String name;
     public String size;
@@ -33,7 +37,7 @@ public class Monster {
     @JsonProperty("damage_immunities")
     public ArrayList<String> damageImmunities;
     @JsonProperty("condition_immunities")
-    public ArrayList<ConditionImmunity> conditionImmunities;
+    public ArrayList<ConditionType> conditionImmunities;
     public Senses senses;
     public String languages;
     @JsonProperty("challenge_rating")
@@ -53,6 +57,14 @@ public class Monster {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getIndex() {
@@ -215,11 +227,11 @@ public class Monster {
         this.damageImmunities = damageImmunities;
     }
 
-    public ArrayList<ConditionImmunity> getConditionImmunities() {
+    public ArrayList<ConditionType> getConditionImmunities() {
         return conditionImmunities;
     }
 
-    public void setConditionImmunities(ArrayList<ConditionImmunity> conditionImmunities) {
+    public void setConditionImmunities(ArrayList<ConditionType> conditionImmunities) {
         this.conditionImmunities = conditionImmunities;
     }
 

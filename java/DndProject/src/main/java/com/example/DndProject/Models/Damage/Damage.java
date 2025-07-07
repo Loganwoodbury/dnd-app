@@ -1,4 +1,4 @@
-package com.example.DndProject.Models.Monster;
+package com.example.DndProject.Models.Damage;
 
 
 
