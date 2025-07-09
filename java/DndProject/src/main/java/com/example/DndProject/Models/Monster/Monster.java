@@ -8,11 +8,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 
 public class Monster {
-    public int id;
     public String index;
     public String name;
     public String size;
     public String type;
+    public int id;
     public String alignment;
     @JsonProperty("armor_class")
     public ArrayList<ArmorClass> armorClass;
@@ -22,7 +22,12 @@ public class Monster {
     public String hitDice;
     @JsonProperty("hit_points_roll")
     public String hitPointsRoll;
-    public Speed speed;
+    public String speedWalk;
+    public String speedFly;
+    public String speedHover;
+    public String speedBurrow;
+    public String speedSwim;
+    private String speedClimb;
     public int strength;
     public int dexterity;
     public int constitution;
@@ -107,6 +112,54 @@ public class Monster {
         this.alignment = alignment;
     }
 
+    public String getSpeedWalk() {
+        return speedWalk;
+    }
+
+    public void setSpeedWalk(String speedWalk) {
+        this.speedWalk = speedWalk;
+    }
+
+    public String getSpeedFly() {
+        return speedFly;
+    }
+
+    public void setSpeedFly(String speedFly) {
+        this.speedFly = speedFly;
+    }
+
+    public String getSpeedHover() {
+        return speedHover;
+    }
+
+    public void setSpeedHover(String speedHover) {
+        this.speedHover = speedHover;
+    }
+
+    public String getSpeedBurrow() {
+        return speedBurrow;
+    }
+
+    public void setSpeedBurrow(String speedBurrow) {
+        this.speedBurrow = speedBurrow;
+    }
+
+    public String getSpeedSwim() {
+        return speedSwim;
+    }
+
+    public void setSpeedSwim(String speedSwim) {
+        this.speedSwim = speedSwim;
+    }
+
+    public String getSpeedClimb() {
+        return speedClimb;
+    }
+
+    public void setSpeedClimb(String speedClimb) {
+        this.speedClimb = speedClimb;
+    }
+
     public ArrayList<ArmorClass> getArmorClass() {
         return armorClass;
     }
@@ -137,14 +190,6 @@ public class Monster {
 
     public void setHitPointsRoll(String hitPointsRoll) {
         this.hitPointsRoll = hitPointsRoll;
-    }
-
-    public Speed getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(Speed speed) {
-        this.speed = speed;
     }
 
     public int getStrength() {
