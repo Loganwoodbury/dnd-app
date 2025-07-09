@@ -22,12 +22,7 @@ public class Monster {
     public String hitDice;
     @JsonProperty("hit_points_roll")
     public String hitPointsRoll;
-    public String speedWalk;
-    public String speedFly;
-    public String speedHover;
-    public String speedBurrow;
-    public String speedSwim;
-    private String speedClimb;
+    private Speed speed;
     public int strength;
     public int dexterity;
     public int constitution;
@@ -112,52 +107,12 @@ public class Monster {
         this.alignment = alignment;
     }
 
-    public String getSpeedWalk() {
-        return speedWalk;
+    public Speed getSpeed() {
+        return speed;
     }
 
-    public void setSpeedWalk(String speedWalk) {
-        this.speedWalk = speedWalk;
-    }
-
-    public String getSpeedFly() {
-        return speedFly;
-    }
-
-    public void setSpeedFly(String speedFly) {
-        this.speedFly = speedFly;
-    }
-
-    public String getSpeedHover() {
-        return speedHover;
-    }
-
-    public void setSpeedHover(String speedHover) {
-        this.speedHover = speedHover;
-    }
-
-    public String getSpeedBurrow() {
-        return speedBurrow;
-    }
-
-    public void setSpeedBurrow(String speedBurrow) {
-        this.speedBurrow = speedBurrow;
-    }
-
-    public String getSpeedSwim() {
-        return speedSwim;
-    }
-
-    public void setSpeedSwim(String speedSwim) {
-        this.speedSwim = speedSwim;
-    }
-
-    public String getSpeedClimb() {
-        return speedClimb;
-    }
-
-    public void setSpeedClimb(String speedClimb) {
-        this.speedClimb = speedClimb;
+    public void setSpeed(Speed speed) {
+        this.speed = speed;
     }
 
     public ArrayList<ArmorClass> getArmorClass() {

@@ -1,5 +1,6 @@
 package com.example.DndProject.Models.Action;
 
+import com.example.DndProject.Models.DC.ActionDc;
 import com.example.DndProject.Models.DC.DcType;
 
 public class LegendaryAction {
@@ -7,7 +8,7 @@ public class LegendaryAction {
     private String name;
     private String description;
     private int damage;
-    private DcType dcType;
+    private ActionDc actionDc;
 
     public int getId() {
         return id;
@@ -41,11 +42,11 @@ public class LegendaryAction {
         this.damage = damage;
     }
 
-    public DcType getDcType() {
-        return dcType;
+    public ActionDc getActionDc() {
+        return actionDc;
     }
 
-    public void setDcType(DcType dcType) {
-        this.dcType = dcType;
+    public void setActionDc(ActionDc actionDc) {
+        this.actionDc = actionDc;
     }
 }

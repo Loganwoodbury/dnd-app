@@ -9,16 +9,16 @@ import java.util.ArrayList;
 
 public class Damage {
 
-    @JsonProperty("damageType")
-    private ArrayList<DamageType> damagetype;
+    @JsonProperty("damage_type")
+    private DamageType damagetype;
     @JsonProperty("damage_dice")
     private String damageDice;
 
-    public ArrayList<DamageType> getDamageType() {
+    public DamageType getDamagetype() {
         return damagetype;
     }
 
-    public void setDamageType(ArrayList<DamageType> damagetype) {
+    public void setDamagetype(DamageType damagetype) {
         this.damagetype = damagetype;
     }
 

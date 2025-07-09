@@ -1,13 +1,18 @@
 package com.example.DndProject.services;
 
 import com.example.DndProject.Models.Monster.Monster;
-import com.example.DndProject.Models.Monster.Results;
+import com.example.DndProject.dao.MonsterDao;
+import org.springframework.stereotype.Component;
 
-import java.util.List;
+@Component
+public class MonsterService {
 
-public interface MonsterService {
+    private final MonsterDao monsterDao;
 
-    List<Results> getMonsters();
+    public MonsterService(MonsterDao monsterDao) {
+        this.monsterDao = monsterDao;
+    }
 
-    Monster getMonsterByName(String name);
+    public Monster createMonster(Monster monster){ return monsterDao.createMonster(monster);}
+    public Monster getMonsterById(int monsterId){ return monsterDao.getMonsterById(monsterId);}
 }

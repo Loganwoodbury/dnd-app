@@ -41,13 +41,132 @@ useEffect(() => {
     getMonsterDetail();
 },[]);
 
+function handleSubmit(){
+    const monster = {
+        index: monsterDet.index,
+        name: monsterDet.name,
+        size: monsterDet.size,
+        type: monsterDet.type,
+        alignment: monsterDet.alignment,
+        hit_points: monsterDet.hit_points,
+        hit_dice: monsterDet.hit_dice,
+        hit_points_roll: monsterDet.hit_points_roll,
+        speed_walk: monsterDet.speed?.walk || 0,
+        speed_swim: monsterDet.speed?.swim || 0,
+        speed_fly: monsterDet.speed?.fly || 0,
+        speed_climb: monsterDet.speed?.climb || 0,
+        speed_burrow: monsterDet.speed?.burrow || 0,
+        speed_hover: monsterDet.speed?.hover || 0,
+        strength: monsterDet.strength,
+        dexterity: monsterDet.dexterity,
+        constitution: monsterDet.constitution,
+        intelligence: monsterDet.intelligence,
+        wisdom: monsterDet.wisdom,
+        charisma: monsterDet.charisma,
+        languages: monsterDet.languages,
+        proficiency_bonus: monsterDet.proficiency_bonus,
+        xp: monsterDet.xp,
+        challenge_rating: monsterDet.challenge_rating,
+        url: monsterDet.url,
+        armorClass: monsterDet.armorClass ? monsterDet.armorClass.map(ac => ({
+            value: ac.value,
+            type: ac.type
+        })) : [],
+        speed: monsterDet.speed ? {
+            walk: monsterDet.speed.walk || 0,
+            swim: monsterDet.speed.swim || 0,
+            fly: monsterDet.speed.fly || 0,
+            climb: monsterDet.speed.climb || 0,
+            burrow: monsterDet.speed.burrow || 0,
+            hover: monsterDet.speed.hover || 0
+        } : {},
+        proficiencies: monsterDet.proficiencies ? monsterDet.proficiencies.map(prof => ({
+            value: prof.value,
+            proficiency: {
+                index: prof.proficiency.index,
+                name: prof.proficiency.name,
+                url: prof.proficiency.url
+            }
+        })) : [],
+        damageVulnerabilities: monsterDet.damage_vulnerabilities || [],
+        damageImmunities: monsterDet.damage_immunities || [],
+        damageResistances: monsterDet.damage_resistances || [],
+        conditionImmunities: monsterDet.condition_immunities ? monsterDet.condition_immunities.map(immunity => ({
+            index: immunity.index,
+            name: immunity.name,
+            url: immunity.url
+        })) : [],
+        senses: monsterDet.senses ? {
+            blindsight: monsterDet.senses.blindsight || 0,
+            darkvision: monsterDet.senses.darkvision || 0,
+            truesight: monsterDet.senses.truesight || 0,
+            tremorsense: monsterDet.senses.tremorsense || 0,
+            passive_perception: monsterDet.senses.passive_perception || 0
+        } : {},
+        specialAbilities: monsterDet.special_abilities ? monsterDet.special_abilities.map(ability => ({
+            name: ability.name,
+            desc: ability.desc,
+            damage: ability.damage ? {
+                damageType: {
+                    index: ability.damage.damage_type.index,
+                    name: ability.damage.damage_type.name,
+                    url: ability.damage.damage_type.url
+                }
+            } : null,
+            usage: ability.usage ? {
+                type: ability.usage.type,
+                times: ability.usage.times || 0,
+            } : null,
+        })) : [],
+        actions: monsterDet.actions ? monsterDet.actions.map(action => ({
+            name: action.name,
+            desc: action.desc,
+            attack_bonus: action.attack_bonus || 0,
+            damage: action.damage && action.damage.damage_type ? {
+                damage_type: {
+                    index: action.damage.damage_type.index,
+                    name: action.damage.damage_type.name,
+                    url: action.damage.damage_type.url
+                },
+                damage_dice: action.damage.damage_dice || ''
+            } : null,
+            damage_bonus: action.damage_bonus || 0,
+            url: action.url,
+            actionDc: action.dc ? {
+                dc_type: {
+                    index: action.dc.dc_type.index,
+                    name: action.dc.dc_type.name,   
+                    url: action.dc.dc_type.url
+                },
+                dc_value: action.dc.dc_value || 0,
+                success_type: action.dc.success_type || ''
+            } : null,
+
+        })) : []
+    }
+
+    MonsterService.createMonster(monster)
+        .then((response) => {
+            console.log('Monster created successfully, from database:', response.data);
+            // Optionally, redirect or show a success message
+        })
+        .catch((error) => {
+            console.error('Error creating monster:', error);
+            // Optionally, show an error message
+        });
+
+
+}
+
 
 return (
     <>
         {isLoading ? (
             <p>Loading...</p>
         ) : (
-            <div className={styles.modalBackdrop}> 
+            <div className={styles.modalBackdrop}>
+            <button onClick={handleSubmit}>Save Monster</button>
+
                 <h1>{monsterDet.name}</h1>
                 
                 <p>

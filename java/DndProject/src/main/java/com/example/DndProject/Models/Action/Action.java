@@ -1,9 +1,11 @@
 package com.example.DndProject.Models.Action;
 
+import com.example.DndProject.Models.DC.ActionDc;
 import com.example.DndProject.Models.Damage.Damage;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Action {
 
@@ -16,6 +18,10 @@ public class Action {
     private String multiAttackType;
     private String usageType;
     private int usageTimes;
+    @JsonProperty("damage")
+    private List<Damage> damage;
+    @JsonProperty("dc")
+    private ActionDc actionDc;
 
     public int getId() {
         return id;
@@ -71,5 +77,21 @@ public class Action {
 
     public void setUsageTimes(int usageTimes) {
         this.usageTimes = usageTimes;
+    }
+
+    public List<Damage> getDamage() {
+        return damage;
+    }
+
+    public void setDamage(List<Damage> damage) {
+        this.damage = damage;
+    }
+
+    public ActionDc getActionDc() {
+        return actionDc;
+    }
+
+    public void setActionDc(ActionDc actionDc) {
+        this.actionDc = actionDc;
     }
 }

@@ -1,9 +1,14 @@
 package com.example.DndProject.Models.DC;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ActionDc {
     private int id;
+    @JsonProperty("dc_type")
     private DcType dcType;
+    @JsonProperty("dc_value")
     private int dcValue;
+    @JsonProperty("success_type")
     private String successType;
 
     public int getId() {

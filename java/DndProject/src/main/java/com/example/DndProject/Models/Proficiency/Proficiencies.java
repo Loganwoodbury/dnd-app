@@ -1,10 +1,12 @@
 package com.example.DndProject.Models.Proficiency;
 
 import com.example.DndProject.Models.Monster.Monster;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Proficiencies {
 
     private Monster monster;
+    @JsonProperty("proficiency")
     private ProficiencyType proficiencyType;
     private int value;
 
