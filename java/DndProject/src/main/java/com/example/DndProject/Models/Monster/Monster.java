@@ -15,7 +15,7 @@ public class Monster {
     public int id;
     public String alignment;
     @JsonProperty("armor_class")
-    public ArrayList<ArmorClass> armorClass;
+    public ArrayList<ArmorClass> armorClass = new ArrayList<>();
     @JsonProperty("hit_points")
     public int hitPoints;
     @JsonProperty("hit_dice")
@@ -50,6 +50,8 @@ public class Monster {
     public String url;
     public ArrayList<Object> legendary_actions;
     public String image;
+
+    public Monster() {};
 
     public String getImage() {
         return image;

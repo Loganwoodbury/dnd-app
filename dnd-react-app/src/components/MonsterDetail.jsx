@@ -68,9 +68,9 @@ function handleSubmit(){
         xp: monsterDet.xp,
         challenge_rating: monsterDet.challenge_rating,
         url: monsterDet.url,
-        armorClass: monsterDet.armorClass ? monsterDet.armorClass.map(ac => ({
+        armor_class: armorClass ? armorClass.map(ac => ({
             value: ac.value,
-            type: ac.type
+            type: ac.type,
         })) : [],
         speed: monsterDet.speed ? {
             walk: monsterDet.speed.walk || 0,
@@ -154,8 +154,18 @@ function handleSubmit(){
             console.error('Error creating monster:', error);
             // Optionally, show an error message
         });
+}
 
-
+function handleLookup() {
+    MonsterService.getMonsterByName(monsterDet.name)
+        .then((response) => {
+            console.log('Monster retrieved successfully:', response.data);
+            // Optionally, redirect or show a success message
+        })
+        .catch((error) => {
+            console.error('Error retrieving monster:', error);
+            // Optionally, show an error message
+        });
 }
 
 
@@ -166,6 +176,7 @@ return (
         ) : (
             <div className={styles.modalBackdrop}>
             <button onClick={handleSubmit}>Save Monster</button>
+            <button onClick={handleLookup}>Look Up Monster</button>
 
                 <h1>{monsterDet.name}</h1>
                 

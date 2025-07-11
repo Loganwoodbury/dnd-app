@@ -13,4 +13,5 @@ public interface MonsterDao {
     Monster createMonster(Monster monster);
 
     Monster getMonsterById(int monsterId);
+
 }

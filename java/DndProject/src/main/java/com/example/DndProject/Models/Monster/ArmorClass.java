@@ -10,6 +10,8 @@ public class ArmorClass {
     private String equipmentDescription;
     private String spellDescription;
 
+    public ArmorClass(){};
+
     public int getId() {
         return id;
     }

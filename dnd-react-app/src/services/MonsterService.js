@@ -20,5 +20,10 @@ export default {
     createMonster(monster) {
         console.log("Adding new monster:", monster);
         return httpMonster.post('/add', monster)
+    },
+
+    getMonsterByName(name) {
+        console.log("full monster from server: ")
+        return httpMonster.get(`/${name}`)
     }
 }

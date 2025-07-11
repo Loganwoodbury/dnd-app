@@ -15,4 +15,8 @@ public class MonsterService {
 
     public Monster createMonster(Monster monster){ return monsterDao.createMonster(monster);}
     public Monster getMonsterById(int monsterId){ return monsterDao.getMonsterById(monsterId);}
+
+    public Monster getMonsterByName(String name) {
+        return monsterDao.getMonsterByName(name);
+    }
 }

@@ -4,6 +4,7 @@ import com.example.DndProject.Models.Monster.Monster;
 import com.example.DndProject.Models.Monster.Results;
 import com.example.DndProject.services.MonsterService;
 import com.example.DndProject.services.RestMonsterService;
+import org.springframework.aot.generate.AccessControl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,15 @@ public class MonsterController {
         Monster monster = null;
 
         monster = monsterService.createMonster(newMonster);
+
+        return monster;
+    }
+
+    @GetMapping("/monster/{name}")
+    public Monster getServerMonsterByName(@PathVariable String name){
+        Monster monster = null;
+
+        monster = monsterService.getMonsterByName(name);
 
         return monster;
     }

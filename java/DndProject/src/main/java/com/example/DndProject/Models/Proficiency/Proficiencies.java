@@ -5,17 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Proficiencies {
 
-    private Monster monster;
+    private int monsterId;
     @JsonProperty("proficiency")
     private ProficiencyType proficiencyType;
     private int value;
 
-    public Monster getMonster() {
-        return monster;
+    public int getMonsterId() {
+        return monsterId;
     }
 
-    public void setMonster(Monster monster) {
-        this.monster = monster;
+    public void setMonsterId(int monsterId) {
+        this.monsterId = monsterId;
     }
 
     public ProficiencyType getProficiencyType() {
