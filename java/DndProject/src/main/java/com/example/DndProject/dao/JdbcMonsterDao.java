@@ -1,5 +1,6 @@
 package com.example.DndProject.dao;
 
+import com.example.DndProject.Models.Damage.DamageResistance;
 import com.example.DndProject.Models.Damage.DamageType;
 import com.example.DndProject.Models.Monster.ArmorClass;
 import com.example.DndProject.Models.Monster.Monster;
@@ -250,6 +251,64 @@ public class JdbcMonsterDao implements MonsterDao {
         return proficiencies;
     }
 
+    private DamageType getDamageTypeByName(String damageTypeName){
+        DamageType damageType = new DamageType();
+
+        String sql = "SELECT * FROM damage_type WHERE name ILIKE ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, damageTypeName);
+            if (results.next()){
+                damageType = mapRowToDamageType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return damageType;
+    }
+
+    private DamageType getDamageTypeById(int damageTypeId){
+        DamageType damageType = new DamageType();
+
+        String sql = "SELECT * FROM damage_type WHERE id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, damageTypeId);
+            if (results.next()){
+                damageType = mapRowToDamageType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return damageType;
+    }
+
+
+    private DamageType createDamageType(DamageType damageType){
+        DamageType newDamageType = new DamageType();
+        DamageType existingDamageType = getDamageTypeByName(damageType.getName());
+
+        String sql = "INSERT INTO damage_type (index, name, url) VALUES (?, ?, ?) RETURNING name";
+        if(existingDamageType == null){
+            try{
+                String newDamageTypename = JDBCTEMPLATE.queryForObject(sql, String.class, damageType.getIndex(), damageType.getName(),
+                        damageType.getUrl());
+                newDamageType = getDamageTypeByName(newDamageTypename);
+            }catch (CannotGetJdbcConnectionException e) {
+                throw new DaoException("Unable to connect to server or database", e);
+            } catch (DataIntegrityViolationException die) {
+                throw new DaoException("Data integrity violation", die);
+            }
+        }
+
+        return newDamageType;
+
+    }
+
     private Monster mapRowToMonster(SqlRowSet rowSet){
         Monster monster = new Monster();
 
@@ -309,5 +368,26 @@ public class JdbcMonsterDao implements MonsterDao {
         proficiencies.setProficiencyType(getProficiencyTypeById(rowSet.getInt("proficiency_type_id")));
 
         return proficiencies;
+    }
+
+    private DamageType mapRowToDamageType(SqlRowSet rowSet){
+        DamageType damageType = new DamageType();
+
+        damageType.setId(rowSet.getInt("id"));
+        damageType.setIndex(rowSet.getString("index"));
+        damageType.setName(rowSet.getString("name"));
+        damageType.setUrl(rowSet.getString("url"));
+
+        return damageType;
+    }
+
+    private DamageResistance mapRowToDamageResistance(SqlRowSet rowSet){
+        DamageResistance damageResistance = new DamageResistance();
+
+        damageResistance.setMonsterId(rowSet.getInt("creature_id"));
+        damageResistance.setDamageType(getDamageTypeById(rowSet.getInt("damage_type_id")));
+        damageResistance.setNotes(rowSet.getString("notes"));
+
+        return damageResistance;
     }
 }
