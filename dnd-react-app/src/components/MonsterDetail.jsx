@@ -90,7 +90,7 @@ function handleSubmit(){
         })) : [],
         damageVulnerabilities: monsterDet.damage_vulnerabilities || [],
         damageImmunities: monsterDet.damage_immunities || [],
-        damageResistances: monsterDet.damage_resistances || [],
+        damage_resistances: monsterDet.damage_resistances || [],
         conditionImmunities: monsterDet.condition_immunities ? monsterDet.condition_immunities.map(immunity => ({
             index: immunity.index,
             name: immunity.name,

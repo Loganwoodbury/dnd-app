@@ -1,7 +1,6 @@
 package com.example.DndProject.dao;
 
-import com.example.DndProject.Models.Damage.DamageResistance;
-import com.example.DndProject.Models.Damage.DamageType;
+import com.example.DndProject.Models.Damage.*;
 import com.example.DndProject.Models.Monster.ArmorClass;
 import com.example.DndProject.Models.Monster.Monster;
 import com.example.DndProject.Models.Proficiency.Proficiencies;
@@ -52,6 +51,14 @@ public class JdbcMonsterDao implements MonsterDao {
         ArrayList<Proficiencies> proficiencies = getCreatureProficiencies(monster.getId());
         monster.setProficiencies(proficiencies);
 
+        //Get damage Resistances
+        ArrayList<DamageResistance> damageResistances = getDamageResistances(monster.getId());
+        monster.setDamageResistances(damageResistances);
+//        ArrayList<String> resistances = new ArrayList<>();
+//        for(DamageResistance damRes : getDamageResistances(monster.getId())){
+//            resistances.add(damRes.getDamageType());
+//        }
+//        monster.setRawDamageResistances(resistances);
         return monster;
     }
 
@@ -105,6 +112,9 @@ public class JdbcMonsterDao implements MonsterDao {
             //create prof junction
             createMonsterProficiencies(monster.getProficiencies(), newMonsterId);
 
+            //create Damage Resistance
+            createImmVulnResType(monster.getRawDamageResistances());
+            createDamageResistance(monster.getRawDamageResistances(), newMonsterId);
 
 
         }catch (CannotGetJdbcConnectionException e){
@@ -304,10 +314,106 @@ public class JdbcMonsterDao implements MonsterDao {
                 throw new DaoException("Data integrity violation", die);
             }
         }
-
         return newDamageType;
-
     }
+
+    private void createImmVulnResType(ArrayList<String> typeName){
+
+        if(typeName != null && !typeName.isEmpty()) {
+            System.out.println("found immrestypeList");
+            for (String type : typeName) {
+                System.out.println(type);
+                ImmVulnResType existingType = getImVulnResTypeByName(type);
+
+                String sql = "INSERT INTO res_imm_vuln_type (damage_type) VALUES (?) RETURNING id";
+
+                if (existingType == null) {
+                    System.out.println("creating restype");
+                    try {
+                        int newTypeId = JDBCTEMPLATE.queryForObject(sql, int.class, type);
+                    } catch (CannotGetJdbcConnectionException e) {
+                        throw new DaoException("Unable to connect to server or database", e);
+                    } catch (DataIntegrityViolationException die) {
+                        throw new DaoException("Data integrity violation", die);
+                    }
+                }
+            }
+        }
+    }
+
+    private ImmVulnResType getImVulnResTypeByName(String typeName){
+        ImmVulnResType immVulnResType = null;
+
+        String sql = "SELECT * FROM res_imm_vuln_type WHERE damage_type ILIKE ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, typeName);
+            if (results.next()) {
+                immVulnResType = mapRowToImmVulnResType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e){
+            throw new DaoException("Unable to connect to server or database", e);
+        }
+
+        return immVulnResType;
+    }
+
+    private ImmVulnResType getImmVulnResTypeById(int typeId){
+        ImmVulnResType resType = new ImmVulnResType();
+        String sql = "SELECT * FROM res_imm_vuln_type WHERE id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, typeId);
+            if (results.next()) {
+                resType = mapRowToImmVulnResType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e){
+            throw new DaoException("Unable to connect to server or database", e);
+        }
+
+        return resType;
+    }
+
+    private void createDamageResistance(ArrayList<String> resTypes, int monsterId){
+        DamageResistance newDamageResistance = new DamageResistance();
+
+        String sql = "INSERT INTO monster_damage_resistance (creature_id, damage_type_id) \n" +
+                "VALUES (?, (SELECT id FROM res_imm_vuln_type WHERE damage_type ILIKE ?)) RETURNING id";
+
+        if(resTypes!= null && !resTypes.isEmpty()) {
+            System.out.println("Found resistances");
+            for (String damRes : resTypes) {
+                System.out.println("inserting into monster resistance: " + damRes);
+                try {
+                    int newJunctionKey = JDBCTEMPLATE.queryForObject(sql, int.class, monsterId, damRes);
+                } catch (CannotGetJdbcConnectionException e) {
+                    throw new DaoException("Unable to connect to server or database", e);
+                } catch (DataIntegrityViolationException die) {
+                    throw new DaoException("Data integrity violation", die);
+                }
+            }
+        }
+    }
+
+    private ArrayList<DamageResistance> getDamageResistances(int monsterId){
+        ArrayList<DamageResistance> damageResistances = new ArrayList<>();
+
+        String sql = "SELECT * FROM monster_damage_resistance WHERE creature_id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, monsterId);
+            while(results.next()){
+                damageResistances.add(mapRowToDamageResistance(results));
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return damageResistances;
+    }
+
+
 
     private Monster mapRowToMonster(SqlRowSet rowSet){
         Monster monster = new Monster();
@@ -381,13 +487,43 @@ public class JdbcMonsterDao implements MonsterDao {
         return damageType;
     }
 
+    private ImmVulnResType mapRowToImmVulnResType(SqlRowSet rowSet){
+        ImmVulnResType immVulnResType = new ImmVulnResType();
+
+        immVulnResType.setId(rowSet.getInt("id"));
+        immVulnResType.setDamageType(rowSet.getString("damage_type"));
+
+        return immVulnResType;
+    }
+
     private DamageResistance mapRowToDamageResistance(SqlRowSet rowSet){
         DamageResistance damageResistance = new DamageResistance();
 
+        damageResistance.setId(rowSet.getInt("id"));
         damageResistance.setMonsterId(rowSet.getInt("creature_id"));
-        damageResistance.setDamageType(getDamageTypeById(rowSet.getInt("damage_type_id")));
+        damageResistance.setResistanceType(getImmVulnResTypeById(rowSet.getInt("damage_type_id")));
         damageResistance.setNotes(rowSet.getString("notes"));
 
         return damageResistance;
+    }
+
+    private DamageImmunity mapRowToDamageImmunity(SqlRowSet rowSet){
+        DamageImmunity damageImmunity = new DamageImmunity();
+
+        damageImmunity.setMonsterId(rowSet.getInt("creature_id"));
+        damageImmunity.setNotes(rowSet.getString("notes"));
+        damageImmunity.setDamageType(getDamageTypeById(rowSet.getInt("damage_type_id")));
+
+        return damageImmunity;
+    }
+
+    private DamageVulnerability mapRowToDamageVulnerability(SqlRowSet rowSet){
+        DamageVulnerability damageVulnerability = new DamageVulnerability();
+
+        damageVulnerability.setMonsterId(rowSet.getInt("creature_id"));
+        damageVulnerability.setDamageType(getDamageTypeById(rowSet.getInt("damage_type_id")));
+        damageVulnerability.setNotes(rowSet.getString("notes"));
+
+        return damageVulnerability;
     }
 }

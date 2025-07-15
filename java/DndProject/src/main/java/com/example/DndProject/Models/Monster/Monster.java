@@ -2,6 +2,7 @@ package com.example.DndProject.Models.Monster;
 
 import com.example.DndProject.Models.Action.Action;
 import com.example.DndProject.Models.Condition.ConditionType;
+import com.example.DndProject.Models.Damage.DamageResistance;
 import com.example.DndProject.Models.Proficiency.Proficiencies;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -31,11 +32,12 @@ public class Monster {
     public int charisma;
     public ArrayList<Proficiencies> proficiencies;
     @JsonProperty("damage_vulnerabilities")
-    public ArrayList<String> damageVulnerabilities;
+    public ArrayList<String> rawDamageVulnerabilities;
     @JsonProperty("damage_resistances")
-    public ArrayList<String> damageResistances;
+    public ArrayList<String> rawDamageResistances;
     @JsonProperty("damage_immunities")
-    public ArrayList<String> damageImmunities;
+    public ArrayList<String> rawDamageImmunities;
+    private ArrayList<DamageResistance> damageResistances;
     @JsonProperty("condition_immunities")
     public ArrayList<ConditionType> conditionImmunities;
     public Senses senses;
@@ -206,27 +208,11 @@ public class Monster {
     }
 
     public ArrayList<String> getDamageVulnerabilities() {
-        return damageVulnerabilities;
+        return rawDamageVulnerabilities;
     }
 
-    public void setDamageVulnerabilities(ArrayList<String> damageVulnerabilities) {
-        this.damageVulnerabilities = damageVulnerabilities;
-    }
-
-    public ArrayList<String> getDamageResistances() {
-        return damageResistances;
-    }
-
-    public void setDamageResistances(ArrayList<String> damageResistances) {
-        this.damageResistances = damageResistances;
-    }
-
-    public ArrayList<String> getDamageImmunities() {
-        return damageImmunities;
-    }
-
-    public void setDamageImmunities(ArrayList<String> damageImmunities) {
-        this.damageImmunities = damageImmunities;
+    public void setDamageVulnerabilities(ArrayList<String> rawDamageVulnerabilities) {
+        this.rawDamageVulnerabilities = rawDamageVulnerabilities;
     }
 
     public ArrayList<ConditionType> getConditionImmunities() {
@@ -235,6 +221,38 @@ public class Monster {
 
     public void setConditionImmunities(ArrayList<ConditionType> conditionImmunities) {
         this.conditionImmunities = conditionImmunities;
+    }
+
+    public ArrayList<String> getRawDamageVulnerabilities() {
+        return rawDamageVulnerabilities;
+    }
+
+    public void setRawDamageVulnerabilities(ArrayList<String> rawDamageVulnerabilities) {
+        this.rawDamageVulnerabilities = rawDamageVulnerabilities;
+    }
+
+    public ArrayList<String> getRawDamageResistances() {
+        return rawDamageResistances;
+    }
+
+    public void setRawDamageResistances(ArrayList<String> rawDamageResistances) {
+        this.rawDamageResistances = rawDamageResistances;
+    }
+
+    public ArrayList<String> getRawDamageImmunities() {
+        return rawDamageImmunities;
+    }
+
+    public void setRawDamageImmunities(ArrayList<String> rawDamageImmunities) {
+        this.rawDamageImmunities = rawDamageImmunities;
+    }
+
+    public ArrayList<DamageResistance> getDamageResistances() {
+        return damageResistances;
+    }
+
+    public void setDamageResistances(ArrayList<DamageResistance> damageResistances) {
+        this.damageResistances = damageResistances;
     }
 
     public Senses getSenses() {

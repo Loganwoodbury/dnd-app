@@ -1,11 +1,21 @@
 package com.example.DndProject.Models.Damage;
 
 import com.example.DndProject.Models.Monster.Monster;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DamageResistance {
+    private int id;
     private int monsterId;
-    private DamageType damageType;
+    private ImmVulnResType resistanceType;
     private String notes;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getMonsterId() {
         return monsterId;
@@ -15,12 +25,12 @@ public class DamageResistance {
         this.monsterId = monsterId;
     }
 
-    public DamageType getDamageType() {
-        return damageType;
+    public ImmVulnResType getResistanceType() {
+        return resistanceType;
     }
 
-    public void setDamageType(DamageType damageType) {
-        this.damageType = damageType;
+    public void setResistanceType(ImmVulnResType resistanceType) {
+        this.resistanceType = resistanceType;
     }
 
     public String getNotes() {
