@@ -1,6 +1,6 @@
 START TRANSACTION;
 
-DROP TABLE IF EXISTS monster, armor_class, proficiency_type, proficiency_junction, damage_type, monster_damage_resistance,
+DROP TABLE IF EXISTS monster, armor_class, proficiency_type, proficiency_junction, damage_type, res_imm_vuln_type, monster_damage_resistance,
 	monster_damage_immunity, monster_damage_vulnerability, condition_type, monster_condition_immunity, special_ability,
 	creature_special_ability, actions, creature_action, action_damage_roll, multiattack_sub_action, dc_type, action_dc,
 	legendary_action, player, character, player_character, journal_entries;
@@ -78,34 +78,42 @@ CREATE TABLE damage_type (
 	CONSTRAINT pk_damage_id PRIMARY KEY (id)
 );
 
+CREATE TABLE res_imm_vuln_type (
+	id serial,
+	damage_type VARCHAR(255),
+
+	CONSTRAINT pk_res_imm_vuln_type PRIMARY KEY (id)
+);
+
 CREATE TABLE monster_damage_resistance (
+	id serial,
 	creature_id INT NOT NULL,
-	damage_type_id INT,
+	damage_type_id INT NOT NULL,
 	notes VARCHAR(255),
 
-	CONSTRAINT pk_monster_dmg_res PRIMARY KEY (creature_id, damage_type_id),
+	CONSTRAINT pk_res_id PRIMARY KEY (id),
 	CONSTRAINT fk_creature_res_id FOREIGN KEY (creature_id) REFERENCES monster (id),
-	CONSTRAINT fk_dmg_type_id FOREIGN KEY (damage_type_id) REFERENCES damage_type (id)
+	CONSTRAINT fk_res_imm_vuln_type_id FOREIGN KEY (damage_type_id) REFERENCES res_imm_vuln_type (id)
 );
 
 CREATE TABLE monster_damage_immunity (
+	id serial,
 	creature_id INT NOT NULL,
-	damage_type_id INT,
+	damage_type VARCHAR(255),
 	notes VARCHAR(255),
 
-	CONSTRAINT pk_monster_dmg_imm PRIMARY KEY (creature_id, damage_type_id),
-	CONSTRAINT fk_creature_imm_id FOREIGN KEY (creature_id) REFERENCES monster (id),
-	CONSTRAINT fk_dmg_type_id FOREIGN KEY (damage_type_id) REFERENCES damage_type (id)
+	CONSTRAINT pk_imm_id PRIMARY KEY (id),
+	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id)
 );
 
 CREATE TABLE monster_damage_vulnerability (
+	id serial,
 	creature_id INT NOT NULL,
-	damage_type_id INT,
+	damage_type VARCHAR(255),
 	notes VARCHAR(255),
 
-	CONSTRAINT pk_monster_dmg_vul PRIMARY KEY (creature_id, damage_type_id),
-	CONSTRAINT fk_creature_vul_id FOREIGN KEY (creature_id) REFERENCES monster (id),
-	CONSTRAINT fk_dmg_type_id FOREIGN KEY (damage_type_id) REFERENCES damage_type (id)
+	CONSTRAINT pk_vuln_id PRIMARY KEY (id),
+	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id)
 );
 
 CREATE TABLE condition_type (
