@@ -4,6 +4,7 @@ import com.example.DndProject.Models.Action.Action;
 import com.example.DndProject.Models.Condition.ConditionType;
 import com.example.DndProject.Models.Damage.DamageImmunity;
 import com.example.DndProject.Models.Damage.DamageResistance;
+import com.example.DndProject.Models.Damage.DamageVulnerability;
 import com.example.DndProject.Models.Proficiency.Proficiencies;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -40,6 +41,7 @@ public class Monster {
     public ArrayList<String> rawDamageImmunities;
     private ArrayList<DamageResistance> damageResistances;
     private ArrayList<DamageImmunity> damageImmunities;
+    private ArrayList<DamageVulnerability> damageVulnerabilities;
     @JsonProperty("condition_immunities")
     public ArrayList<ConditionType> conditionImmunities;
     public Senses senses;
@@ -209,13 +211,6 @@ public class Monster {
         this.proficiencies = proficiencies;
     }
 
-    public ArrayList<String> getDamageVulnerabilities() {
-        return rawDamageVulnerabilities;
-    }
-
-    public void setDamageVulnerabilities(ArrayList<String> rawDamageVulnerabilities) {
-        this.rawDamageVulnerabilities = rawDamageVulnerabilities;
-    }
 
     public ArrayList<ConditionType> getConditionImmunities() {
         return conditionImmunities;
@@ -263,6 +258,14 @@ public class Monster {
 
     public void setDamageImmunities(ArrayList<DamageImmunity> damageImmunities) {
         this.damageImmunities = damageImmunities;
+    }
+
+    public ArrayList<DamageVulnerability> getDamageVulnerabilities() {
+        return damageVulnerabilities;
+    }
+
+    public void setDamageVulnerabilities(ArrayList<DamageVulnerability> damageVulnerabilities) {
+        this.damageVulnerabilities = damageVulnerabilities;
     }
 
     public Senses getSenses() {

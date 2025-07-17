@@ -57,6 +57,9 @@ public class JdbcMonsterDao implements MonsterDao {
 
         //Get damage Immunities
         monster.setDamageImmunities(getDamageImmunity(monster.getId()));
+
+        //Get damage Vulnerabilities
+        monster.setDamageVulnerabilities(getDamageVulnerability(monster.getId()));
         return monster;
     }
 
@@ -117,6 +120,10 @@ public class JdbcMonsterDao implements MonsterDao {
             //create Damage immunity
             createImmVulnResType(monster.getRawDamageImmunities());
             createDamageImmunity(monster.getRawDamageImmunities(),  newMonsterId);
+
+            //create Damage Vulnerability
+            createImmVulnResType(monster.getRawDamageVulnerabilities());
+            createDamageVulnerablity(monster.getRawDamageVulnerabilities(), newMonsterId);
 
 
 
@@ -452,6 +459,44 @@ public class JdbcMonsterDao implements MonsterDao {
             throw new DaoException("Data integrity violation", die);
         }
         return damageImmunities;
+    }
+
+    private void createDamageVulnerablity(ArrayList<String> vulnerabilities, int monsterId){
+
+        String sql = "INSERT INTO monster_damage_vulnerability (creature_id, damage_type_id) \n" +
+                "VALUES (?, (SELECT id FROM res_imm_vuln_type WHERE damage_type ILIKE ?)) RETURNING id";
+
+        if(vulnerabilities!= null && !vulnerabilities.isEmpty()) {
+            System.out.println("Found vulnerabilites");
+            for (String damVuln : vulnerabilities) {
+                System.out.println("inserting into monster vulnerability: " + damVuln);
+                try {
+                    int newJunctionKey = JDBCTEMPLATE.queryForObject(sql, int.class, monsterId, damVuln);
+                } catch (CannotGetJdbcConnectionException e) {
+                    throw new DaoException("Unable to connect to server or database", e);
+                } catch (DataIntegrityViolationException die) {
+                    throw new DaoException("Data integrity violation", die);
+                }
+            }
+        }
+    }
+
+    private ArrayList<DamageVulnerability> getDamageVulnerability(int monsterId){
+        ArrayList<DamageVulnerability> damageVulnerabilities = new ArrayList<>();
+
+        String sql = "SELECT * FROM monster_damage_vulnerability WHERE creature_id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, monsterId);
+            while(results.next()){
+                damageVulnerabilities.add(mapRowToDamageVulnerability(results));
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return damageVulnerabilities;
 
     }
 
@@ -563,8 +608,9 @@ public class JdbcMonsterDao implements MonsterDao {
     private DamageVulnerability mapRowToDamageVulnerability(SqlRowSet rowSet){
         DamageVulnerability damageVulnerability = new DamageVulnerability();
 
+        damageVulnerability.setId(rowSet.getInt("id"));
         damageVulnerability.setMonsterId(rowSet.getInt("creature_id"));
-        damageVulnerability.setDamageType(getDamageTypeById(rowSet.getInt("damage_type_id")));
+        damageVulnerability.setVulnType(getImmVulnResTypeById(rowSet.getInt("damage_type_id")));
         damageVulnerability.setNotes(rowSet.getString("notes"));
 
         return damageVulnerability;
