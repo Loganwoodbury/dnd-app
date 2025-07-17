@@ -99,21 +99,23 @@ CREATE TABLE monster_damage_resistance (
 CREATE TABLE monster_damage_immunity (
 	id serial,
 	creature_id INT NOT NULL,
-	damage_type VARCHAR(255),
+	damage_type_id INT NOT NULL,
 	notes VARCHAR(255),
 
 	CONSTRAINT pk_imm_id PRIMARY KEY (id),
-	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id)
+	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id),
+	CONSTRAINT fk_imm_type_id FOREIGN KEY (damage_type_id) REFERENCES res_imm_vuln_type (id)
 );
 
 CREATE TABLE monster_damage_vulnerability (
 	id serial,
 	creature_id INT NOT NULL,
-	damage_type VARCHAR(255),
+	damage_type_id INT NOT NULL,
 	notes VARCHAR(255),
 
 	CONSTRAINT pk_vuln_id PRIMARY KEY (id),
-	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id)
+	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id),
+	CONSTRAINT fk_vuln_type_id FOREIGN KEY (damage_type_id) REFERENCES res_imm_vuln_type (id)
 );
 
 CREATE TABLE condition_type (

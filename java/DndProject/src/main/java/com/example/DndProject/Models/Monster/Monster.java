@@ -2,6 +2,7 @@ package com.example.DndProject.Models.Monster;
 
 import com.example.DndProject.Models.Action.Action;
 import com.example.DndProject.Models.Condition.ConditionType;
+import com.example.DndProject.Models.Damage.DamageImmunity;
 import com.example.DndProject.Models.Damage.DamageResistance;
 import com.example.DndProject.Models.Proficiency.Proficiencies;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -38,6 +39,7 @@ public class Monster {
     @JsonProperty("damage_immunities")
     public ArrayList<String> rawDamageImmunities;
     private ArrayList<DamageResistance> damageResistances;
+    private ArrayList<DamageImmunity> damageImmunities;
     @JsonProperty("condition_immunities")
     public ArrayList<ConditionType> conditionImmunities;
     public Senses senses;
@@ -253,6 +255,14 @@ public class Monster {
 
     public void setDamageResistances(ArrayList<DamageResistance> damageResistances) {
         this.damageResistances = damageResistances;
+    }
+
+    public ArrayList<DamageImmunity> getDamageImmunities() {
+        return damageImmunities;
+    }
+
+    public void setDamageImmunities(ArrayList<DamageImmunity> damageImmunities) {
+        this.damageImmunities = damageImmunities;
     }
 
     public Senses getSenses() {

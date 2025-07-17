@@ -54,11 +54,9 @@ public class JdbcMonsterDao implements MonsterDao {
         //Get damage Resistances
         ArrayList<DamageResistance> damageResistances = getDamageResistances(monster.getId());
         monster.setDamageResistances(damageResistances);
-//        ArrayList<String> resistances = new ArrayList<>();
-//        for(DamageResistance damRes : getDamageResistances(monster.getId())){
-//            resistances.add(damRes.getDamageType());
-//        }
-//        monster.setRawDamageResistances(resistances);
+
+        //Get damage Immunities
+        monster.setDamageImmunities(getDamageImmunity(monster.getId()));
         return monster;
     }
 
@@ -115,6 +113,11 @@ public class JdbcMonsterDao implements MonsterDao {
             //create Damage Resistance
             createImmVulnResType(monster.getRawDamageResistances());
             createDamageResistance(monster.getRawDamageResistances(), newMonsterId);
+
+            //create Damage immunity
+            createImmVulnResType(monster.getRawDamageImmunities());
+            createDamageImmunity(monster.getRawDamageImmunities(),  newMonsterId);
+
 
 
         }catch (CannotGetJdbcConnectionException e){
@@ -413,6 +416,45 @@ public class JdbcMonsterDao implements MonsterDao {
         return damageResistances;
     }
 
+    private void createDamageImmunity(ArrayList<String> immunities, int monsterId){
+
+        String sql = "INSERT INTO monster_damage_immunity (creature_id, damage_type_id) \n" +
+                "VALUES (?, (SELECT id FROM res_imm_vuln_type WHERE damage_type ILIKE ?)) RETURNING id";
+
+        if(immunities!= null && !immunities.isEmpty()) {
+            System.out.println("Found immunities");
+            for (String damImm : immunities) {
+                System.out.println("inserting into monster immunity: " + damImm);
+                try {
+                    int newJunctionKey = JDBCTEMPLATE.queryForObject(sql, int.class, monsterId, damImm);
+                } catch (CannotGetJdbcConnectionException e) {
+                    throw new DaoException("Unable to connect to server or database", e);
+                } catch (DataIntegrityViolationException die) {
+                    throw new DaoException("Data integrity violation", die);
+                }
+            }
+        }
+    }
+
+    private ArrayList<DamageImmunity> getDamageImmunity(int monsterId){
+        ArrayList<DamageImmunity> damageImmunities = new ArrayList<>();
+
+        String sql = "SELECT * FROM monster_damage_immunity WHERE creature_id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, monsterId);
+            while(results.next()){
+                damageImmunities.add(mapRowToDamageImmunity(results));
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return damageImmunities;
+
+    }
+
 
 
     private Monster mapRowToMonster(SqlRowSet rowSet){
@@ -510,9 +552,10 @@ public class JdbcMonsterDao implements MonsterDao {
     private DamageImmunity mapRowToDamageImmunity(SqlRowSet rowSet){
         DamageImmunity damageImmunity = new DamageImmunity();
 
+        damageImmunity.setId(rowSet.getInt("id"));
         damageImmunity.setMonsterId(rowSet.getInt("creature_id"));
         damageImmunity.setNotes(rowSet.getString("notes"));
-        damageImmunity.setDamageType(getDamageTypeById(rowSet.getInt("damage_type_id")));
+        damageImmunity.setImmunityType(getImmVulnResTypeById(rowSet.getInt("damage_type_id")));
 
         return damageImmunity;
     }

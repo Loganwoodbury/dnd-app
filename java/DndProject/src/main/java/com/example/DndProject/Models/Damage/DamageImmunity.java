@@ -3,9 +3,19 @@ package com.example.DndProject.Models.Damage;
 import com.example.DndProject.Models.Monster.Monster;
 
 public class DamageImmunity {
+
+    private int id;
     private int monsterId;
-    private DamageType damageType;
+    private ImmVulnResType immunityType;
     private String notes;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public int getMonsterId() {
         return monsterId;
@@ -15,12 +25,12 @@ public class DamageImmunity {
         this.monsterId = monsterId;
     }
 
-    public DamageType getDamageType() {
-        return damageType;
+    public ImmVulnResType getImmunityType() {
+        return immunityType;
     }
 
-    public void setDamageType(DamageType damageType) {
-        this.damageType = damageType;
+    public void setImmunityType(ImmVulnResType immunityType) {
+        this.immunityType = immunityType;
     }
 
     public String getNotes() {
