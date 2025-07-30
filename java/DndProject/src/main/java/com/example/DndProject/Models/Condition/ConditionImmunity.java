@@ -1,18 +1,19 @@
 package com.example.DndProject.Models.Condition;
 
 import com.example.DndProject.Models.Monster.Monster;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ConditionImmunity {
 
-    private Monster monster;
+    private int monsterId;
     private ConditionType conditionType;
 
-    public Monster getMonster() {
-        return monster;
+    public int getMonsterId() {
+        return monsterId;
     }
 
-    public void setMonster(Monster monster) {
-        this.monster = monster;
+    public void setMonsterId(int monsterId) {
+        this.monsterId = monsterId;
     }
 
     public ConditionType getConditionType() {

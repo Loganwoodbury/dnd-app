@@ -91,7 +91,7 @@ function handleSubmit(){
         damageVulnerabilities: monsterDet.damage_vulnerabilities || [],
         damage_immunities: monsterDet.damage_immunities || [],
         damage_resistances: monsterDet.damage_resistances || [],
-        conditionImmunities: monsterDet.condition_immunities ? monsterDet.condition_immunities.map(immunity => ({
+        condition_immunities: monsterDet.condition_immunities ? monsterDet.condition_immunities.map(immunity => ({
             index: immunity.index,
             name: immunity.name,
             url: immunity.url

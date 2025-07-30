@@ -1,6 +1,7 @@
 package com.example.DndProject.Models.Monster;
 
 import com.example.DndProject.Models.Action.Action;
+import com.example.DndProject.Models.Condition.ConditionImmunity;
 import com.example.DndProject.Models.Condition.ConditionType;
 import com.example.DndProject.Models.Damage.DamageImmunity;
 import com.example.DndProject.Models.Damage.DamageResistance;
@@ -43,7 +44,8 @@ public class Monster {
     private ArrayList<DamageImmunity> damageImmunities;
     private ArrayList<DamageVulnerability> damageVulnerabilities;
     @JsonProperty("condition_immunities")
-    public ArrayList<ConditionType> conditionImmunities;
+    public ArrayList<ConditionType> rawConditionImmunities;
+    private ArrayList<ConditionImmunity> conditionImmunities;
     public Senses senses;
     public String languages;
     @JsonProperty("challenge_rating")
@@ -211,12 +213,19 @@ public class Monster {
         this.proficiencies = proficiencies;
     }
 
+    public ArrayList<ConditionType> getRawConditionImmunities() {
+        return rawConditionImmunities;
+    }
 
-    public ArrayList<ConditionType> getConditionImmunities() {
+    public void setRawConditionImmunities(ArrayList<ConditionType> rawConditionImmunities) {
+        this.rawConditionImmunities = rawConditionImmunities;
+    }
+
+    public ArrayList<ConditionImmunity> getConditionImmunities() {
         return conditionImmunities;
     }
 
-    public void setConditionImmunities(ArrayList<ConditionType> conditionImmunities) {
+    public void setConditionImmunities(ArrayList<ConditionImmunity> conditionImmunities) {
         this.conditionImmunities = conditionImmunities;
     }
 

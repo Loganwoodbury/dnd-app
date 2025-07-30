@@ -1,5 +1,7 @@
 package com.example.DndProject.dao;
 
+import com.example.DndProject.Models.Condition.ConditionImmunity;
+import com.example.DndProject.Models.Condition.ConditionType;
 import com.example.DndProject.Models.Damage.*;
 import com.example.DndProject.Models.Monster.ArmorClass;
 import com.example.DndProject.Models.Monster.Monster;
@@ -124,6 +126,9 @@ public class JdbcMonsterDao implements MonsterDao {
             //create Damage Vulnerability
             createImmVulnResType(monster.getRawDamageVulnerabilities());
             createDamageVulnerablity(monster.getRawDamageVulnerabilities(), newMonsterId);
+
+            //create ConditionType
+            createConditionType(monster.getRawConditionImmunities());
 
 
 
@@ -500,6 +505,65 @@ public class JdbcMonsterDao implements MonsterDao {
 
     }
 
+    private void createConditionType(ArrayList<ConditionType> conditionTypes){
+        System.out.println(conditionTypes);
+        String sql = "INSERT INTO condition_type(index, name, url) " +
+                "VALUES(?, ?, ?)";
+        List<Object[]> batchArgs = new ArrayList<>();
+        if(conditionTypes != null && !conditionTypes.isEmpty()) {
+            System.out.println("found conditions");
+            for (ConditionType condition : conditionTypes) {
+                ConditionType existingType = getConditionTypeByName(condition.getName());
+                if(existingType == null) {
+                    System.out.println("inserting into conditiontype : " + condition.getName());
+                    batchArgs.add(new Object[]{
+                            condition.getIndex(),
+                            condition.getName(),
+                            condition.getUrl()
+                    });
+                }
+            }
+            JDBCTEMPLATE.batchUpdate(sql, batchArgs);
+        }
+    }
+
+    private ConditionType getConditionTypeById(int typeId){
+
+        ConditionType condition = new ConditionType();
+        String sql = "SELECT * FROM condition_type WHERE id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, typeId);
+            if(results.next()){
+                condition = mapRowToConditionType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return condition;
+    }
+
+    private ConditionType getConditionTypeByName(String name){
+        ConditionType conditionType = new ConditionType();
+
+        String sql = "SELECT * FROM condition_type WHERE name ILIKE ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, name);
+            if(results.next()){
+                conditionType = mapRowToConditionType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return conditionType;
+
+    }
+
 
 
     private Monster mapRowToMonster(SqlRowSet rowSet){
@@ -614,5 +678,25 @@ public class JdbcMonsterDao implements MonsterDao {
         damageVulnerability.setNotes(rowSet.getString("notes"));
 
         return damageVulnerability;
+    }
+
+    private ConditionType mapRowToConditionType(SqlRowSet rowSet){
+        ConditionType condition = new ConditionType();
+
+        condition.setId(rowSet.getInt("id"));
+        condition.setIndex(rowSet.getString("index"));
+        condition.setName(rowSet.getString("name"));
+        condition.setUrl(rowSet.getString("url"));
+
+        return condition;
+    }
+
+    private ConditionImmunity mapRowToConditionImmunity(SqlRowSet rowSet){
+        ConditionImmunity conditionImmunity = new ConditionImmunity();
+
+        conditionImmunity.setConditionType(getConditionTypeById(rowSet.getInt("condition_type_id")));
+        conditionImmunity.setMonsterId(rowSet.getInt("creature_id"));
+
+        return conditionImmunity;
     }
 }
