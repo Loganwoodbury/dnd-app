@@ -5,6 +5,8 @@ import com.example.DndProject.Models.Condition.ConditionType;
 import com.example.DndProject.Models.Damage.*;
 import com.example.DndProject.Models.Monster.ArmorClass;
 import com.example.DndProject.Models.Monster.Monster;
+import com.example.DndProject.Models.Monster.Senses;
+import com.example.DndProject.Models.Monster.Speed;
 import com.example.DndProject.Models.Proficiency.Proficiencies;
 import com.example.DndProject.Models.Proficiency.ProficiencyType;
 import com.example.DndProject.exception.DaoException;
@@ -62,6 +64,16 @@ public class JdbcMonsterDao implements MonsterDao {
 
         //Get damage Vulnerabilities
         monster.setDamageVulnerabilities(getDamageVulnerability(monster.getId()));
+
+        //Get condition Immunities
+        monster.setConditionImmunities(getCreatureConditionImmunity(monster.getId()));
+
+        //Get speed
+        monster.setSpeed(getCreatureSpeed(monster.getId()));
+
+        //Get senses
+        monster.setSenses(getCreatureSenses(monster.getId()));
+
         return monster;
     }
 
@@ -129,6 +141,12 @@ public class JdbcMonsterDao implements MonsterDao {
 
             //create ConditionType
             createConditionType(monster.getRawConditionImmunities());
+            //create MonsterCondition
+            createMonsterConditionImmunity(monster.getRawConditionImmunities(), newMonsterId);
+            //create speed
+            createCreatureSpeed(monster.getSpeed(), newMonsterId);
+            //create senses
+            createCreatureSenses(monster.getSenses(), newMonsterId);
 
 
 
@@ -514,7 +532,7 @@ public class JdbcMonsterDao implements MonsterDao {
             System.out.println("found conditions");
             for (ConditionType condition : conditionTypes) {
                 ConditionType existingType = getConditionTypeByName(condition.getName());
-                if(existingType == null) {
+                if(existingType.getName() == null) {
                     System.out.println("inserting into conditiontype : " + condition.getName());
                     batchArgs.add(new Object[]{
                             condition.getIndex(),
@@ -562,6 +580,108 @@ public class JdbcMonsterDao implements MonsterDao {
         }
         return conditionType;
 
+    }
+
+    private void createMonsterConditionImmunity(ArrayList<ConditionType> conditions, int monsterId){
+
+        String sql = "INSERT INTO monster_condition_immunity(creature_id, condition_type_id) " +
+                "VALUES (?, (SELECT id FROM condition_type WHERE name ILIKE ?))";
+
+        List<Object[]> batchArgs = new ArrayList<>();
+        if(conditions != null && !conditions.isEmpty()) {
+            for (ConditionType condition : conditions) {
+                    System.out.println("creating monster condition : " + condition.getName());
+                    batchArgs.add(new Object[]{
+                            monsterId,
+                            condition.getName()
+                    });
+                }
+            JDBCTEMPLATE.batchUpdate(sql, batchArgs);
+        }
+    }
+
+    private ArrayList<ConditionImmunity> getCreatureConditionImmunity(int monsterId){
+        ArrayList<ConditionImmunity> conditionImmunities = new ArrayList<>();
+
+        String sql = "SELECT * FROM monster_condition_immunity WHERE creature_id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, monsterId);
+            while(results.next()){
+                conditionImmunities.add(mapRowToConditionImmunity(results));
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return conditionImmunities;
+    }
+
+    private void createCreatureSpeed(Speed speed, int monsterId){
+        System.out.println(speed);
+
+        String sql = "INSERT INTO speed (creature_id, walk, fly, hover, burrow, climb, swim) " +
+                "VALUES(?, ?, ?, ?, ?, ?, ?) RETURNING id";
+
+        try {
+            int newJunctionKey = JDBCTEMPLATE.queryForObject(sql, int.class, monsterId, speed.getWalk(),speed.getFly(),
+                speed.getHover(), speed.getBurrow(), speed.getClimb(), speed.getSwim());
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+    }
+
+    private Speed getCreatureSpeed(int monsterId){
+        Speed speed = new Speed();
+        String sql = "SELECT * FROM speed WHERE creature_id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, monsterId);
+            if(results.next()){
+                speed = mapRowToSpeed(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return speed;
+    }
+
+    private void createCreatureSenses(Senses senses, int monsterId){
+
+        String sql = "INSERT INTO senses (creature_id, darkvision, blindsight, tremorsense, truesight, passive_perception) " +
+                "VALUES ( ?, ?, ?, ?, ?, ?) RETURNING id";
+
+        try{
+            int newSensesId = JDBCTEMPLATE.queryForObject(sql, int.class, monsterId, senses.getDarkvision(), senses.getBlindsight(),
+                    senses.getTremorsense(), senses.getTruesight(), senses.getPassivePerception());
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+    }
+
+    private Senses getCreatureSenses(int monsterId){
+        Senses senses = new Senses();
+
+        String sql = "SELECT * FROM senses WHERE creature_id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, monsterId);
+            if(results.next()){
+                senses = mapRowToSenses(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return senses;
     }
 
 
@@ -698,5 +818,30 @@ public class JdbcMonsterDao implements MonsterDao {
         conditionImmunity.setMonsterId(rowSet.getInt("creature_id"));
 
         return conditionImmunity;
+    }
+
+    private Speed mapRowToSpeed(SqlRowSet rowSet){
+        Speed speed = new Speed();
+
+        speed.setWalk(rowSet.getString("walk"));
+        speed.setFly(rowSet.getString("fly"));
+        speed.setHover(rowSet.getString("hover"));
+        speed.setBurrow(rowSet.getString("burrow"));
+        speed.setClimb(rowSet.getString("climb"));
+        speed.setSwim(rowSet.getString("swim"));
+
+        return speed;
+    }
+
+    private Senses mapRowToSenses(SqlRowSet rowSet){
+        Senses senses = new Senses();
+
+        senses.setDarkvision(rowSet.getString("darkvision"));
+        senses.setBlindsight(rowSet.getString("blindsight"));
+        senses.setTremorsense(rowSet.getString("tremorsense"));
+        senses.setTruesight(rowSet.getString("truesight"));
+        senses.setPassivePerception(rowSet.getInt("passive_perception"));
+
+        return senses;
     }
 }

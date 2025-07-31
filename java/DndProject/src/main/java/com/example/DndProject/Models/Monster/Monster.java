@@ -26,6 +26,7 @@ public class Monster {
     public String hitDice;
     @JsonProperty("hit_points_roll")
     public String hitPointsRoll;
+    @JsonProperty("speed")
     private Speed speed;
     public int strength;
     public int dexterity;

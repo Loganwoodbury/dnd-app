@@ -1,7 +1,7 @@
 START TRANSACTION;
 
 DROP TABLE IF EXISTS monster, armor_class, proficiency_type, proficiency_junction, damage_type, res_imm_vuln_type, monster_damage_resistance,
-	monster_damage_immunity, monster_damage_vulnerability, condition_type, monster_condition_immunity, special_ability,
+	monster_damage_immunity, monster_damage_vulnerability, condition_type, monster_condition_immunity, speed, senses, special_ability,
 	creature_special_ability, actions, creature_action, action_damage_roll, multiattack_sub_action, dc_type, action_dc,
 	legendary_action, player, character, player_character, journal_entries;
 
@@ -15,12 +15,6 @@ CREATE TABLE monster (
 	hit_points INT NOT NULL,
 	hit_dice VARCHAR(50) NOT NULL,
 	hit_points_roll VARCHAR(50) NOT NULL,
-	speed_walk VARCHAR(50),
-	speed_fly VARCHAR(50),
-	speed_hover VARCHAR(50),
-	speed_burrow VARCHAR(50),
-	speed_swim VARCHAR(50),
-	speed_climb VARCHAR(50),
 	strength INT NOT NULL,
     dexterity INT NOT NULL,
     constitution INT NOT NULL,
@@ -134,6 +128,33 @@ CREATE TABLE monster_condition_immunity (
 	CONSTRAINT pk_monster_cond_imm PRIMARY KEY (creature_id, condition_type_id),
 	CONSTRAINT fk_creature_cond_imm FOREIGN KEY (creature_id) REFERENCES monster (id),
 	CONSTRAINT fk_creature_cond_imm_type FOREIGN KEY (condition_type_id) REFERENCES condition_type (id)
+);
+
+CREATE TABLE speed (
+	id SERIAL,
+	creature_id int NOT NULL,
+	walk VARCHAR(100),
+	fly VARCHAR(100),
+	hover VARCHAR(100),
+	burrow VARCHAR(100),
+	climb VARCHAR(100),
+	swim VARCHAR(100),
+	
+	CONSTRAINT pk_walk_id PRIMARY KEY (id),
+	CONSTRAINT fk_speed_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id)
+);
+
+CREATE TABLE senses (
+	id serial,
+	creature_id int NOT NULL,
+	darkvision VARCHAR(100),
+	blindsight VARCHAR(100),
+	tremorsense VARCHAR(100),
+	truesight VARCHAR(100),
+	passive_perception int,
+
+	CONSTRAINT pk_senses_id PRIMARY KEY (id),
+	CONSTRAINT fk_senses_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id)
 );
 
 CREATE TABLE special_ability (
