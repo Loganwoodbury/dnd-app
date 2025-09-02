@@ -1,12 +1,12 @@
 package com.example.DndProject.dao;
 
+import com.example.DndProject.Models.Action.Usage;
 import com.example.DndProject.Models.Condition.ConditionImmunity;
 import com.example.DndProject.Models.Condition.ConditionType;
+import com.example.DndProject.Models.DC.ActionDc;
+import com.example.DndProject.Models.DC.DcType;
 import com.example.DndProject.Models.Damage.*;
-import com.example.DndProject.Models.Monster.ArmorClass;
-import com.example.DndProject.Models.Monster.Monster;
-import com.example.DndProject.Models.Monster.Senses;
-import com.example.DndProject.Models.Monster.Speed;
+import com.example.DndProject.Models.Monster.*;
 import com.example.DndProject.Models.Proficiency.Proficiencies;
 import com.example.DndProject.Models.Proficiency.ProficiencyType;
 import com.example.DndProject.exception.DaoException;
@@ -147,6 +147,9 @@ public class JdbcMonsterDao implements MonsterDao {
             createCreatureSpeed(monster.getSpeed(), newMonsterId);
             //create senses
             createCreatureSenses(monster.getSenses(), newMonsterId);
+            //create special ability
+            createSpecialAbility(monster.getSpecial_abilities(), newMonsterId);
+
 
 
 
@@ -331,23 +334,22 @@ public class JdbcMonsterDao implements MonsterDao {
     }
 
 
-    private DamageType createDamageType(DamageType damageType){
-        DamageType newDamageType = new DamageType();
-        DamageType existingDamageType = getDamageTypeByName(damageType.getName());
+    private void createDamageType(DamageType damageType){
+        DamageType existingType = getDamageTypeByName(damageType.getName());
 
-        String sql = "INSERT INTO damage_type (index, name, url) VALUES (?, ?, ?) RETURNING name";
-        if(existingDamageType == null){
+        String sql = "INSERT INTO damage_type (name, index, url)" +
+                "VALUES (?, ?, ?) RETURNING id";
+
+        if (existingType.getName() == null) {
+            System.out.println("creating damage type: " + damageType.getName());
             try{
-                String newDamageTypename = JDBCTEMPLATE.queryForObject(sql, String.class, damageType.getIndex(), damageType.getName(),
-                        damageType.getUrl());
-                newDamageType = getDamageTypeByName(newDamageTypename);
+                int newDamageTypeId = JDBCTEMPLATE.queryForObject(sql, int.class, damageType.getName(), damageType.getIndex(), damageType.getUrl());
             }catch (CannotGetJdbcConnectionException e) {
                 throw new DaoException("Unable to connect to server or database", e);
             } catch (DataIntegrityViolationException die) {
                 throw new DaoException("Data integrity violation", die);
             }
         }
-        return newDamageType;
     }
 
     private void createImmVulnResType(ArrayList<String> typeName){
@@ -684,6 +686,175 @@ public class JdbcMonsterDao implements MonsterDao {
         return senses;
     }
 
+    private void createSpecialAbility(List<SpecialAbility> specialAbilities, int monsterId){
+
+        for(SpecialAbility ability: specialAbilities) {
+
+            String sql = "INSERT INTO special_ability (name, ability_desc)" +
+                    "VALUES (?,?) RETURNING id";
+
+            try {
+                int newSpecialAbilityId = JDBCTEMPLATE.queryForObject(sql, int.class, ability.getName(),
+                        ability.getDesc());
+
+                if (ability.getDamage() != null && !ability.getDamage().isEmpty()){
+                    createAbilityDamageJunction(newSpecialAbilityId, ability.getDamage());
+                }
+                if(ability.getActionDc() != null){
+                    createSpecialAbilityDcJunction(newSpecialAbilityId,ability.getActionDc());
+                }
+
+                createMonsterSpecialAbility(newSpecialAbilityId, monsterId);
+
+            } catch (CannotGetJdbcConnectionException e) {
+                throw new DaoException("Unable to connect to server or database", e);
+            } catch (DataIntegrityViolationException die) {
+                throw new DaoException("Data integrity violation", die);
+            }
+        }
+    }
+
+    private void createMonsterSpecialAbility(int abilityId, int monsterId){
+
+        String sql = "INSERT INTO creature_special_ability (creature_id, special_ability_id)" +
+                "VALUES (?,?)RETURNING ID";
+
+        try{
+            int newAbilityId = JDBCTEMPLATE.queryForObject(sql, int.class, monsterId, abilityId);
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+    }
+
+    private void createAbilityDamageJunction(int specialAbilityId, List<Damage> damages){
+        if(damages != null && !damages.isEmpty()){
+            String sql = "INSERT INTO special_ability_damage_junction (special_ability_id, damage_id)" +
+                    "VALUES (?, ?) RETURNING id";
+
+            for(Damage damage : damages){
+                createDamageType(damage.getDamagetype());
+                int damageTypeId = getDamageTypeByName(damage.getDamagetype().getName()).getId();
+                int newDamageId = createDamage(damage, damageTypeId);
+
+                try{
+                    JDBCTEMPLATE.queryForObject(sql, int.class, specialAbilityId, newDamageId);
+                }catch (CannotGetJdbcConnectionException e) {
+                    throw new DaoException("Unable to connect to server or database", e);
+                } catch (DataIntegrityViolationException die) {
+                    throw new DaoException("Data integrity violation", die);
+                }
+            }
+        }
+    }
+
+    private int createDamage(Damage damage, int damageTypeId) {
+
+        int newDamageId;
+        String sql = "INSERT INTO damage (damage_type_id, damage_dice)" +
+                "VALUES (?, ?) RETURNING id";
+
+        try{
+            newDamageId = JDBCTEMPLATE.queryForObject(sql, int.class, damageTypeId, damage.getDamageDice());
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return newDamageId;
+    }
+
+    private void createSpecialAbilityDcJunction(int specialAbilityId, ActionDc actionDc){
+
+        String sql = "INSERT INTO special_ability_dc_junction (special_ability_id, dc_id)" +
+                "VALUES (?, ?) RETURNING id";
+
+        int newDcTypeId = createDcType(actionDc.getDcType());
+        int newDcId = createActionDc(newDcTypeId, actionDc);
+
+        try{
+            JDBCTEMPLATE.queryForObject(sql, int.class, specialAbilityId, newDcId);
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+    }
+
+
+    private int createActionDc(int dcTypeId, ActionDc actionDc){
+        int newActionDcId;
+
+        String sql = "INSERT INTO action_dc (dc_type_id, dc_value, success_type)" +
+                "VALUES (?, ?, ?) RETURNING id";
+
+        try{
+            newActionDcId = JDBCTEMPLATE.queryForObject(sql, int.class, dcTypeId, actionDc.getDcValue(), actionDc.getSuccessType());
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return newActionDcId;
+    }
+
+    private int createDcType(DcType dcType){
+
+        int newDcId =dcType.getId();
+        String sql = "INSERT INTO dc_type ( index, name, url) " +
+                "values(?, ?, ?) RETURNING id";
+
+        DcType existingDcType = getDcTypeByName(dcType.getName());
+
+        if(existingDcType.getName() == null){
+            try {
+                newDcId = JDBCTEMPLATE.queryForObject(sql, int.class, dcType.getIndex(), dcType.getName(), dcType.getUrl());
+            }catch (CannotGetJdbcConnectionException e) {
+                throw new DaoException("Unable to connect to server or database", e);
+            } catch (DataIntegrityViolationException die) {
+                throw new DaoException("Data integrity violation", die);
+            }
+        }
+        return newDcId;
+    }
+
+    private DcType getDcTypeByName(String name){
+        DcType dcType = new DcType();
+
+        String sql = "SELECT * FROM dc_type WHERE name ILIKE ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, name);
+            if(results.next()){
+                dcType = mapRowToDcType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return dcType;
+    }
+
+    private int createUsage(Usage actionUsage){
+
+        int newUsageId;
+
+        String sql = "INSERT INTO usages (type, times, dice, minvalue)" +
+                "VALUES(?,?,?,?)RETURNING id";
+
+        try{
+            newUsageId = JDBCTEMPLATE.queryForObject(sql, int.class, actionUsage.getType(), actionUsage.getTimes(),
+                    actionUsage.getDice(), actionUsage.getMinValue());
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+        return newUsageId;
+    }
+
 
 
     private Monster mapRowToMonster(SqlRowSet rowSet){
@@ -843,5 +1014,16 @@ public class JdbcMonsterDao implements MonsterDao {
         senses.setPassivePerception(rowSet.getInt("passive_perception"));
 
         return senses;
+    }
+
+    private DcType mapRowToDcType(SqlRowSet rowSet){
+        DcType dcType = new DcType();
+
+        dcType.setId(rowSet.getInt("id"));
+        dcType.setIndex(rowSet.getString("index"));
+        dcType.setName(rowSet.getString("name"));
+        dcType.setUrl(rowSet.getString("url"));
+
+        return dcType;
     }
 }

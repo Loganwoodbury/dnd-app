@@ -54,6 +54,7 @@ public class Monster {
     @JsonProperty("proficiency_bonus")
     public int proficiencyBonus;
     public int xp;
+    @JsonProperty("special_abilities")
     public ArrayList<SpecialAbility> special_abilities;
     public ArrayList<Action> actions;
     public String url;

@@ -1,9 +1,9 @@
 START TRANSACTION;
 
 DROP TABLE IF EXISTS monster, armor_class, proficiency_type, proficiency_junction, damage_type, res_imm_vuln_type, monster_damage_resistance,
-	monster_damage_immunity, monster_damage_vulnerability, condition_type, monster_condition_immunity, speed, senses, special_ability,
-	creature_special_ability, actions, creature_action, action_damage_roll, multiattack_sub_action, dc_type, action_dc,
-	legendary_action, player, character, player_character, journal_entries;
+	monster_damage_immunity, monster_damage_vulnerability, condition_type, monster_condition_immunity, speed, senses, special_ability, damage, usages, 
+	creature_special_ability, special_ability_damage_junction, special_ability_usage_junction, actions, creature_action, action_damage_roll, multiattack_sub_action, dc_type, action_dc,
+	legendary_action, special_ability_dc_junction, player, character, player_character, journal_entries;
 
 CREATE TABLE monster (
 	id serial,
@@ -69,7 +69,7 @@ CREATE TABLE damage_type (
 	index VARCHAR(100) UNIQUE,
 	url TEXT UNIQUE,
 
-	CONSTRAINT pk_damage_id PRIMARY KEY (id)
+	CONSTRAINT pk_damage_type_id PRIMARY KEY (id)
 );
 
 CREATE TABLE res_imm_vuln_type (
@@ -157,22 +157,24 @@ CREATE TABLE senses (
 	CONSTRAINT fk_senses_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id)
 );
 
-CREATE TABLE special_ability (
+CREATE TABLE damage (
 	id serial,
-	index VARCHAR(255) UNIQUE NOT NULL,
-	name VARCHAR(255) UNIQUE NOT NULL,
-	ability_desc TEXT,
+	damage_type_id int,
+	damage_dice VARCHAR(100),
 
-	CONSTRAINT pk_special_ability PRIMARY KEY (id)
+	CONSTRAINT pk_damage_id PRIMARY KEY (id),
+	CONSTRAINT fk_damage_type_id FOREIGN KEY (damage_type_id) REFERENCES damage_type (id)
+	
 );
 
-CREATE TABLE creature_special_ability (
-	creature_id INT NOT NULL,
-	special_ability_id INT NOT NULL,
+CREATE TABLE usages (
+	id serial,
+	type VARCHAR(100),
+	times INT,
+	dice VARCHAR(100),
+	minvalue int,
 
-	CONSTRAINT pk_creature_special_ability PRIMARY KEY (creature_id, special_ability_id),
-	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id),
-	CONSTRAINT fk_special_ability_id FOREIGN KEY (special_ability_id) REFERENCES special_ability (id)
+	CONSTRAINT pk_usages_id PRIMARY KEY (id)
 );
 
 CREATE TABLE actions (
@@ -229,12 +231,60 @@ CREATE TABLE dc_type (
 
 CREATE TABLE action_dc (
 	id serial,
-	dc_type INT NOT NULL,
+	dc_type_id INT NOT NULL,
 	dc_value INT NOT NULL,
 	success_type TEXT,
 
 	CONSTRAINT pk_action_dc PRIMARY KEY (id),
-	CONSTRAINT fk_dc_type FOREIGN KEY (dc_type) REFERENCES dc_type (id)
+	CONSTRAINT fk_dc_type_id FOREIGN KEY (dc_type_id) REFERENCES dc_type (id)
+);
+
+CREATE TABLE special_ability (
+	id serial,
+	name VARCHAR(255),
+	ability_desc TEXT,
+
+	CONSTRAINT pk_special_ability PRIMARY KEY (id)
+);
+
+CREATE TABLE special_ability_damage_junction (
+	id serial,
+	special_ability_id INT NOT NULL,
+	damage_id INT NOT NULL,
+
+	CONSTRAINT pk_ability_damage_junction PRIMARY KEY (id),
+	CONSTRAINT fk_special_ability_id FOREIGN KEY (special_ability_id) REFERENCES special_ability (id),
+	CONSTRAINT fk_damage_id FOREIGN KEY (damage_id) REFERENCES damage (id)
+);
+
+CREATE TABLE special_ability_dc_junction (
+	id serial,
+	special_ability_id INT NOT NULL,
+	dc_id INT NOT NULL,
+
+	CONSTRAINT pk_sa_dc_junction PRIMARY KEY (id),
+	CONSTRAINT fk_sadc_abiltiy_id FOREIGN KEY (special_ability_id) REFERENCES special_ability (id),
+	CONSTRAINT fk_sadc_dc_id FOREIGN KEY (dc_id) REFERENCES action_dc (id)
+);
+
+CREATE TABLE special_ability_usage_junction (
+	id serial,
+	special_ability_id INT NOT NULL,
+	usage_id INT NOT NULL,
+
+	CONSTRAINT pk_sa_usage_junction PRIMARY KEY (id),
+	CONSTRAINT fk_usage_sa_id FOREIGN KEY (special_ability_id) REFERENCES special_ability (id),
+	CONSTRAINT fk_sa_usage_id FOREIGN KEY (usage_id) REFERENCES usages (id)
+);
+
+CREATE TABLE creature_special_ability (
+	id serial,
+	creature_id INT NOT NULL,
+	special_ability_id INT NOT NULL,
+
+	CONSTRAINT pk_creature_special_ability PRIMARY KEY (creature_id, special_ability_id),
+	CONSTRAINT fk_creature_id FOREIGN KEY (creature_id) REFERENCES monster (id),
+	CONSTRAINT fk_special_ability_id FOREIGN KEY (special_ability_id) REFERENCES special_ability (id)
 );
 
 CREATE TABLE legendary_action (

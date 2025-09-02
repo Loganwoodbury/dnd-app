@@ -97,19 +97,29 @@ function handleSubmit(){
             tremorsense: monsterDet.senses.tremorsense || 0,
             passive_perception: monsterDet.senses.passive_perception || 0
         } : {},
-        specialAbilities: monsterDet.special_abilities ? monsterDet.special_abilities.map(ability => ({
+        special_abilities: monsterDet.special_abilities ? monsterDet.special_abilities.map(ability => ({
             name: ability.name,
             desc: ability.desc,
-            damage: ability.damage ? {
-                damageType: {
-                    index: ability.damage.damage_type.index,
-                    name: ability.damage.damage_type.name,
-                    url: ability.damage.damage_type.url
-                }
-            } : null,
+            damage: ability.damage ? ability.damage.map(d => ({
+                damage_type: {
+                    index: d.damage_type.index,
+                    name: d.damage_type.name,
+                    url: d.damage_type.url
+                },
+                damage_dice: d.damage_dice || ''
+            })) : [],
             usage: ability.usage ? {
                 type: ability.usage.type,
                 times: ability.usage.times || 0,
+            } : null,
+            dc: ability.dc ? {
+                dc_type: {
+                    index: ability.dc.dc_type.index,
+                    name: ability.dc.dc_type.name,   
+                    url: ability.dc.dc_type.url
+                },
+                dc_value: ability.dc.dc_value || null,
+                success_type: ability.dc.success_type || ''
             } : null,
         })) : [],
         actions: monsterDet.actions ? monsterDet.actions.map(action => ({
