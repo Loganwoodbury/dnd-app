@@ -258,21 +258,21 @@ CREATE TABLE special_ability_damage_junction (
 );
 
 CREATE TABLE special_ability_dc_junction (
-	id serial,
+	junction_id serial,
 	special_ability_id INT NOT NULL,
 	dc_id INT NOT NULL,
 
-	CONSTRAINT pk_sa_dc_junction PRIMARY KEY (id),
+	CONSTRAINT pk_sa_dc_junction PRIMARY KEY (junction_id),
 	CONSTRAINT fk_sadc_abiltiy_id FOREIGN KEY (special_ability_id) REFERENCES special_ability (id),
 	CONSTRAINT fk_sadc_dc_id FOREIGN KEY (dc_id) REFERENCES action_dc (id)
 );
 
 CREATE TABLE special_ability_usage_junction (
-	id serial,
+	junction_id serial,
 	special_ability_id INT NOT NULL,
 	usage_id INT NOT NULL,
 
-	CONSTRAINT pk_sa_usage_junction PRIMARY KEY (id),
+	CONSTRAINT pk_sa_usage_junction PRIMARY KEY (junction_id),
 	CONSTRAINT fk_usage_sa_id FOREIGN KEY (special_ability_id) REFERENCES special_ability (id),
 	CONSTRAINT fk_sa_usage_id FOREIGN KEY (usage_id) REFERENCES usages (id)
 );

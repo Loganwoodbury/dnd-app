@@ -74,6 +74,9 @@ public class JdbcMonsterDao implements MonsterDao {
         //Get senses
         monster.setSenses(getCreatureSenses(monster.getId()));
 
+        //Get Special Abilities
+        monster.setSpecial_abilities(getCreatureSpecialAbility(monster.getId()));
+
         return monster;
     }
 
@@ -703,6 +706,9 @@ public class JdbcMonsterDao implements MonsterDao {
                 if(ability.getActionDc() != null){
                     createSpecialAbilityDcJunction(newSpecialAbilityId,ability.getActionDc());
                 }
+                if(ability.getUsage() !=null){
+                    createAbilityUsageJunction(newSpecialAbilityId, ability.getUsage());
+                }
 
                 createMonsterSpecialAbility(newSpecialAbilityId, monsterId);
 
@@ -768,7 +774,7 @@ public class JdbcMonsterDao implements MonsterDao {
     private void createSpecialAbilityDcJunction(int specialAbilityId, ActionDc actionDc){
 
         String sql = "INSERT INTO special_ability_dc_junction (special_ability_id, dc_id)" +
-                "VALUES (?, ?) RETURNING id";
+                "VALUES (?, ?) RETURNING junction_id";
 
         int newDcTypeId = createDcType(actionDc.getDcType());
         int newDcId = createActionDc(newDcTypeId, actionDc);
@@ -837,6 +843,22 @@ public class JdbcMonsterDao implements MonsterDao {
         return dcType;
     }
 
+    private void createAbilityUsageJunction(int abilityId, Usage usage){
+
+        String sql = "INSERT INTO special_ability_usage_junction (special_ability_id, usage_id)" +
+                "VALUES (?, ?) RETURNING junction_id";
+
+        int newUsageId = createUsage(usage);
+
+        try{
+            int newJunctionId = JDBCTEMPLATE.queryForObject(sql, int.class, abilityId, newUsageId);
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+    }
+
     private int createUsage(Usage actionUsage){
 
         int newUsageId;
@@ -854,6 +876,116 @@ public class JdbcMonsterDao implements MonsterDao {
         }
         return newUsageId;
     }
+
+    private ArrayList<SpecialAbility> getCreatureSpecialAbility(int monsterId){
+        ArrayList<SpecialAbility> abilities = new ArrayList<>();
+
+        String sql = "SELECT * FROM special_ability AS sa\n" +
+                "\tJOIN creature_special_ability as csa ON sa.id = csa.special_ability_id\n" +
+                "\tWHERE csa.creature_id = ?;";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, monsterId);
+            while(results.next()){
+                abilities.add(mapRowToSpecialAbility(results));
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+
+        for(SpecialAbility ability: abilities){
+            ability.setDamage(getDamage(ability.getId()));
+            ability.setUsage(getUsageById(ability.getId()));
+            ability.setActionDc(getActionDcById(ability.getId()));
+        }
+
+        return abilities;
+
+    }
+
+    private Usage getUsageById(int abilityId){
+        Usage usage = new Usage();
+
+        String sql = "SELECT * FROM usages AS u\n" +
+                "\tJOIN special_ability_usage_junction as sau\n" +
+                "\tON sau.usage_id = u.id\n" +
+                "WHERE sau.special_ability_id = ?;";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, abilityId);
+            if(results.next()){
+                usage = mapRowToUsage(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+
+        return usage;
+    }
+
+    private ActionDc getActionDcById(int abilityId){
+        ActionDc actionDc = new ActionDc();
+
+        String sql = "SELECT * FROM action_dc AS adc\n" +
+                "\tJOIN special_ability_dc_junction as sadc\n" +
+                "\tON sadc.dc_id = adc.id\n" +
+                "WHERE sadc.special_ability_id = ?;";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, abilityId);
+            if(results.next()){
+                actionDc = mapRowToActionDc(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+
+        return actionDc;
+    }
+
+    private DcType getDcTypeById(int typeId){
+        DcType dcType = new DcType();
+
+        String sql = "SELECT * FROM dc_type WHERE id = ?";
+
+        try{
+            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, typeId);
+            if(results.next()){
+                dcType = mapRowToDcType(results);
+            }
+        }catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException die) {
+            throw new DaoException("Data integrity violation", die);
+        }
+
+        return dcType;
+    }
+
+//    private SpecialAbility getSpecialAbilityById(int abilityId){
+//        SpecialAbility specialAbility = new SpecialAbility();
+//
+//        String sql = "SELECT * from special_ability WHERE id = ?";
+//
+//        try{
+//            SqlRowSet results = JDBCTEMPLATE.queryForRowSet(sql, abilityId);
+//            if(results.next()){
+//                specialAbility = mapRowToSpecialAbility(results);
+//            }
+//        }catch (CannotGetJdbcConnectionException e) {
+//            throw new DaoException("Unable to connect to server or database", e);
+//        } catch (DataIntegrityViolationException die) {
+//            throw new DaoException("Data integrity violation", die);
+//        }
+//
+//        return specialAbility;
+//    }
 
 
 
@@ -1026,4 +1158,38 @@ public class JdbcMonsterDao implements MonsterDao {
 
         return dcType;
     }
+
+    private SpecialAbility mapRowToSpecialAbility(SqlRowSet rowSet){
+        SpecialAbility specialAbility = new SpecialAbility();
+
+        specialAbility.setId(rowSet.getInt("id"));
+        specialAbility.setName(rowSet.getString("name"));
+        specialAbility.setDesc(rowSet.getString("ability_desc"));
+
+        return specialAbility;
+    }
+
+    private Usage mapRowToUsage(SqlRowSet rowSet){
+        Usage usage = new Usage();
+
+        usage.setId(rowSet.getInt("id"));
+        usage.setTimes(rowSet.getInt("times"));
+        usage.setType(rowSet.getString("type"));
+        usage.setDice(rowSet.getString("dice"));
+        usage.setMinValue(rowSet.getInt("minvalue"));
+
+        return usage;
+    }
+
+    private ActionDc mapRowToActionDc(SqlRowSet rowSet){
+        ActionDc actionDc = new ActionDc();
+
+        actionDc.setId(rowSet.getInt("id"));
+        actionDc.setDcType(getDcTypeById(rowSet.getInt("dc_type_id")));
+        actionDc.setDcValue(rowSet.getInt("dc_value"));
+        actionDc.setSuccessType(rowSet.getString("success_type"));
+
+        return actionDc;
+    }
+
 }

@@ -14,6 +14,7 @@ public class SpecialAbility {
     private String name;
     private String desc;
     private Usage usage;
+    @JsonProperty("dc")
     private ActionDc actionDc;
     @JsonProperty("damage")
     private List<Damage> damage;
